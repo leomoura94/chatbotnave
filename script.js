@@ -1,4 +1,16 @@
-document.addEventListener("DOMContentLoaded", startChat);
+document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("userInput");
+    const btn = document.getElementById("sendButton");
+
+    if (input && btn) {
+        input.disabled = false;
+        btn.disabled = false;
+    }
+
+    startChat();
+});
+
+
 let chat;
 let userName = "";
 let etapa = "inicio";
