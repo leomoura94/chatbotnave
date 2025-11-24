@@ -1,3 +1,4 @@
+document.addEventListener("DOMContentLoaded", startChat);
 let chat;
 let userName = "";
 let etapa = "inicio";
