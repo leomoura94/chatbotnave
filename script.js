@@ -4,6 +4,7 @@ let etapa = "inicio";
 let pedido = [];
 let total = 0;
 
+// CARDÁPIO
 const menu = {
     "Strogonoff de Carne": 30,
     "Strogonoff de Frango": 25,
@@ -12,18 +13,23 @@ const menu = {
     "Suco": 10
 };
 
+// Função para adicionar mensagens
 function addMessage(text, sender, buttons = []) {
     const div = document.createElement("div");
     div.classList.add("message", sender);
     div.innerHTML = text;
     chat.appendChild(div);
 
+    // Botões
     if (buttons.length > 0) {
         buttons.forEach(btn => {
-            let b = document.createElement("button");
+            const b = document.createElement("button");
             b.classList.add("option");
             b.innerText = btn.text;
-            b.onclick = () => btn.action(btn.text);
+            b.onclick = () => {
+                addMessage(btn.text, "user");
+                btn.action();
+            };
             chat.appendChild(b);
         });
     }
@@ -31,16 +37,21 @@ function addMessage(text, sender, buttons = []) {
     chat.scrollTop = chat.scrollHeight;
 }
 
+// Inicializar chat
 function startChat() {
-    addMessage("Olá, me chamo <b>Nave</b> e serei seu garçom virtual.<br><br>Qual seu nome?", "bot");
+    addMessage(
+        "Olá, me chamo <b>Nave</b> e serei seu garçom virtual.<br><br>Qual seu nome?",
+        "bot"
+    );
+
     document.getElementById("userInput").disabled = false;
     document.getElementById("sendButton").disabled = false;
 }
 
+// Quando o usuário digita algo
 function sendMessage() {
     const input = document.getElementById("userInput");
     const msg = input.value.trim();
-
     if (msg === "") return;
 
     addMessage(msg, "user");
@@ -53,24 +64,37 @@ function sendMessage() {
         return;
     }
 
-    if (etapa === "elogioSugestaoTexto") {
-        addMessage(`Muito obrigado pelo seu retorno, ${userName}! ❤️<br>Quer voltar ao menu?`, "bot", [
-            { text: "Sim", action: menuPrincipal },
-            { text: "Não", action: finalizar }
-        ]);
+    if (etapa === "elogioTexto") {
+        addMessage(
+            `Obrigado pela sua mensagem, ${userName}! ❤️`,
+            "bot",
+            [
+                { text: "Voltar ao menu", action: menuPrincipal },
+                { text: "Encerrar", action: finalizar }
+            ]
+        );
     }
 }
 
+// MENU PRINCIPAL
 function menuPrincipal() {
     etapa = "menu";
-    addMessage(`Como posso ajudar, ${userName}?`, "bot", [
-        { text: "1 - Fazer pedido", action: iniciarPedido },
-        { text: "2 - Sugestão da Nave", action: sugestaoNave },
-        { text: "3 - Elogio ou Sugestão", action: elogioSugestao },
-        { text: "4 - Endereço", action: endereco }
-    ]);
+
+    addMessage(
+        `Como posso ajudar, ${userName}?`,
+        "bot",
+        [
+            { text: "1 - Fazer pedido", action: iniciarPedido },
+            { text: "2 - Sugestão da Nave", action: sugestaoNave },
+            { text: "3 - Elogio ou Sugestão", action: elogioSugestao },
+            { text: "4 - Endereço", action: endereco }
+        ]
+    );
 }
 
+// =======================
+//       FAZER PEDIDO
+// =======================
 function iniciarPedido() {
     etapa = "pedido";
     mostrarCardapio();
@@ -78,11 +102,11 @@ function iniciarPedido() {
 
 function mostrarCardapio() {
     addMessage("Escolha um item do cardápio:", "bot", [
-        { text: "Strogonoff de Carne - R$30", action: () => escolherItem("Strogonoff de Carne") },
-        { text: "Strogonoff de Frango - R$25", action: () => escolherItem("Strogonoff de Frango") },
-        { text: "Macarrão à Bolonhesa - R$18", action: () => escolherItem("Macarrão à Bolonhesa") },
-        { text: "Refrigerante - R$7", action: () => escolherItem("Refrigerante") },
-        { text: "Suco - R$10", action: () => escolherItem("Suco") }
+        { text: "Strogonoff de Carne - R$ 30", action: () => escolherItem("Strogonoff de Carne") },
+        { text: "Strogonoff de Frango - R$ 25", action: () => escolherItem("Strogonoff de Frango") },
+        { text: "Macarrão à Bolonhesa - R$ 18", action: () => escolherItem("Macarrão à Bolonhesa") },
+        { text: "Refrigerante - R$ 7", action: () => escolherItem("Refrigerante") },
+        { text: "Suco - R$ 10", action: () => escolherItem("Suco") }
     ]);
 }
 
@@ -90,22 +114,36 @@ function escolherItem(item) {
     pedido.push(item);
     total += menu[item];
 
-    addMessage(`Você escolheu: <b>${item}</b>. Confirmar?`, "bot", [
-        { text: "Confirmar", action: confirmarItem },
-        { text: "Cancelar", action: mostrarCardapio }
-    ]);
+    addMessage(
+        `Você escolheu <b>${item}</b>. Confirmar?`,
+        "bot",
+        [
+            { text: "Confirmar", action: confirmarItem },
+            { text: "Cancelar", action: () => {
+                pedido.pop();
+                total -= menu[item];
+                mostrarCardapio();
+            }}
+        ]
+    );
 }
 
 function confirmarItem() {
-    addMessage("Deseja adicionar mais algum item?", "bot", [
-        { text: "Sim", action: mostrarCardapio },
-        { text: "Não", action: formaPagamento }
-    ]);
+    addMessage(
+        "Deseja adicionar mais algum item?",
+        "bot",
+        [
+            { text: "Sim", action: mostrarCardapio },
+            { text: "Não", action: formaPagamento }
+        ]
+    );
 }
 
 function formaPagamento() {
+    let lista = pedido.join("<br>");
+
     addMessage(
-        `Seu pedido ficou:<br>${pedido.join("<br>")}<br><br><b>Total: R$ ${total}</b><br><br>Forma de pagamento?`,
+        `Seu pedido:<br><br>${lista}<br><br><b>Total: R$ ${total}</b><br><br>Selecione a forma de pagamento:`,
         "bot",
         [
             { text: "Débito", action: finalizar },
@@ -117,9 +155,11 @@ function formaPagamento() {
     );
 }
 
+// =======================
+//     SUGESTÃO DA NAVE
+// =======================
 function sugestaoNave() {
     etapa = "sugestao";
-
     addMessage("Do que você mais gosta?", "bot", [
         { text: "Carne", action: () => sugestaoItem("Carne") },
         { text: "Frango", action: () => sugestaoItem("Frango") },
@@ -134,19 +174,23 @@ function sugestaoItem(tipo) {
     if (tipo === "Frango") item = "Strogonoff de Frango";
     if (tipo === "Macarrão") item = "Macarrão à Bolonhesa";
 
-    addMessage(`Sugiro para você: <b>${item}</b> – R$ ${menu[item]}. Deseja adicionar bebida?`, "bot", [
-        { text: "Sim", action: bebidasSugestao },
-        { text: "Não", action: finalizarSugestao }
-    ]);
-
     pedido = [item];
     total = menu[item];
+
+    addMessage(
+        `Sugestão da Nave para você:<br><b>${item}</b> (R$ ${menu[item]})<br><br>Deseja adicionar bebida?`,
+        "bot",
+        [
+            { text: "Sim", action: bebidasSugestao },
+            { text: "Não", action: finalizarSugestao }
+        ]
+    );
 }
 
 function bebidasSugestao() {
     addMessage("Escolha a bebida:", "bot", [
-        { text: "Refrigerante - R$7", action: () => bebidaEscolhida("Refrigerante") },
-        { text: "Suco - R$10", action: () => bebidaEscolhida("Suco") }
+        { text: "Refrigerante - R$ 7", action: () => bebidaEscolhida("Refrigerante") },
+        { text: "Suco - R$ 10", action: () => bebidaEscolhida("Suco") }
     ]);
 }
 
@@ -158,34 +202,46 @@ function bebidaEscolhida(bebida) {
 
 function finalizarSugestao() {
     addMessage(
-        `Pedido finalizado:<br>${pedido.join("<br>")}<br><br>Total: <b>R$${total}</b><br><br>Nossos funcionários estão correndo para finalizar seu pedido!`,
+        `Pedido finalizado:<br>${pedido.join("<br>")}<br><br>Total: <b>R$ ${total}</b><br><br>Nossos funcionários já estão preparando seu pedido!`,
         "bot"
     );
 }
 
+// =======================
+//  ELOGIO OU SUGESTÃO
+// =======================
 function elogioSugestao() {
-    etapa = "elogioOuSugestao";
-
+    etapa = "escolhaElogio";
     addMessage("Você deseja enviar um:", "bot", [
-        { text: "Elogio", action: elogioSugestaoTexto },
-        { text: "Sugestão", action: elogioSugestaoTexto }
+        { text: "Elogio", action: elogioTexto },
+        { text: "Sugestão", action: elogioTexto }
     ]);
 }
 
-function elogioSugestaoTexto() {
-    etapa = "elogioSugestaoTexto";
-    addMessage("Escreva sua mensagem:", "bot");
+function elogioTexto() {
+    etapa = "elogioTexto";
+    addMessage("Digite sua mensagem:", "bot");
 }
 
+// =======================
+//        ENDEREÇO
+// =======================
 function endereco() {
-    addMessage("📍 Nosso endereço:<br>Rua Nossa Senhora Auxiliadora, 25.", "bot", [
-        { text: "Voltar ao menu", action: menuPrincipal }
-    ]);
+    addMessage(
+        "📍 Nosso endereço:<br><b>Rua Nossa Senhora Auxiliadora, 25</b>",
+        "bot",
+        [
+            { text: "Voltar ao menu", action: menuPrincipal }
+        ]
+    );
 }
 
+// =======================
+//     FINALIZAR
+// =======================
 function finalizar() {
     addMessage(
-        `Muito obrigado, ${userName}! 🙌<br>Seu pedido está sendo preparado pela equipe!`,
+        `Obrigado ${userName}! 🙌<br>Seu pedido está sendo preparado.`,
         "bot"
     );
 }
