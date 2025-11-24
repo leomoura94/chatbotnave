@@ -4,7 +4,6 @@ let etapa = "inicio";
 let pedido = [];
 let total = 0;
 
-// Cardápio
 const menu = {
     "Strogonoff de Carne": 30,
     "Strogonoff de Frango": 25,
@@ -13,22 +12,21 @@ const menu = {
     "Suco": 10
 };
 
-// -------------------------
-// INÍCIO DO CHAT
-// -------------------------
 document.addEventListener("DOMContentLoaded", () => {
     chat = document.getElementById("chat");
 
-    addMessage("Olá, me chamo <b>Nave</b> e serei seu garçom virtual.<br><br>Qual seu nome?", "bot");
-
+    // Garante que o botão funciona SEM ERRO
     const sendButton = document.getElementById("sendButton");
-    sendButton.addEventListener("click", sendMessage);
+    const input = document.getElementById("userInput");
+
+    if (sendButton) {
+        sendButton.disabled = false;
+        sendButton.onclick = sendMessage;  // ← TROCA CRUCIAL
+    }
+
+    addMessage("Olá, me chamo <b>Nave</b> e serei seu garçom virtual.<br><br>Qual seu nome?", "bot");
 });
 
-
-// -------------------------
-// ADICIONAR MENSAGEM AO CHAT
-// -------------------------
 function addMessage(text, sender, buttons = []) {
     const div = document.createElement("div");
     div.classList.add("message", sender);
@@ -51,10 +49,6 @@ function addMessage(text, sender, buttons = []) {
     chat.scrollTop = chat.scrollHeight;
 }
 
-
-// -------------------------
-// PROCESSAR MENSAGEM DO USUÁRIO
-// -------------------------
 function sendMessage() {
     const input = document.getElementById("userInput");
     const msg = input.value.trim();
@@ -79,10 +73,6 @@ function sendMessage() {
     }
 }
 
-
-// -------------------------
-// MENU PRINCIPAL
-// -------------------------
 function menuPrincipal() {
     etapa = "menu";
 
@@ -98,10 +88,6 @@ function menuPrincipal() {
     );
 }
 
-
-// -------------------------
-// FAZER PEDIDO
-// -------------------------
 function iniciarPedido() {
     etapa = "pedido";
     mostrarCardapio();
@@ -156,10 +142,6 @@ function formaPagamento() {
     );
 }
 
-
-// -------------------------
-// SUGESTÃO DA NAVE
-// -------------------------
 function sugestaoNave() {
     etapa = "sugestao";
 
@@ -210,10 +192,6 @@ function finalizarSugestao() {
     );
 }
 
-
-// -------------------------
-// ELOGIO / SUGESTÃO
-// -------------------------
 function elogioSugestao() {
     etapa = "elogioEscolha";
 
@@ -228,10 +206,6 @@ function elogioTexto() {
     addMessage("Digite sua mensagem:", "bot");
 }
 
-
-// -------------------------
-// ENDEREÇO
-// -------------------------
 function endereco() {
     addMessage(
         "📍 Nosso endereço:<br><b>Rua Nossa Senhora Auxiliadora, 25</b>",
@@ -242,10 +216,6 @@ function endereco() {
     );
 }
 
-
-// -------------------------
-// FINALIZAR
-// -------------------------
 function finalizar() {
     addMessage(
         `Obrigado, ${userName}! 🙌<br>Seu pedido está sendo preparado.`,
