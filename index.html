@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nave Chatbot</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chatbot Nave</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
     <div class="chat-container">
-        <div class="header">Seja Bem Vindo a Nave</div>
+        <div class="header">Atendente Virtual Nave</div>
 
         <div id="chat" class="chat-box"></div>
 
         <div class="input-box">
-            <input id="userInput" type="text" placeholder="Digite sua mensagem..." />
-            <button onclick="sendMessage()">Enviar</button>
+            <input id="userInput" type="text" placeholder="Digite aqui..." disabled />
+            <button id="sendButton" onclick="sendMessage()" disabled>Enviar</button>
         </div>
     </div>
 
